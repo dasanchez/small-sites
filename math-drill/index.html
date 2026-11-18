@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F5F6FA">
+  <title>Math Drill</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232F4FD8'/%3E%3Cpath d='M20 32h24M32 20v24' stroke='white' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/questions.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+<main class="app">
+
+  <!-- 1 · Setup -->
+  <section id="screen-setup" class="screen screen-setup" aria-labelledby="setup-title">
+    <header class="setup-head">
+      <h1 id="setup-title" class="title">Math Drill</h1>
+      <p class="lede">Set up your round of 10 questions.</p>
+    </header>
+
+    <section class="group" aria-labelledby="ops-label">
+      <h2 id="ops-label" class="eyebrow">Operations</h2>
+      <div class="op-grid">
+        <button type="button" class="op-toggle" data-op="+" aria-pressed="true">
+          <span class="op-symbol">+</span><span class="op-name">Addition</span>
+          <svg class="op-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
+        </button>
+        <button type="button" class="op-toggle" data-op="-" aria-pressed="false">
+          <span class="op-symbol">−</span><span class="op-name">Subtraction</span>
+          <svg class="op-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
+        </button>
+        <button type="button" class="op-toggle" data-op="*" aria-pressed="false">
+          <span class="op-symbol">×</span><span class="op-name">Multiplication</span>
+          <svg class="op-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
+        </button>
+        <button type="button" class="op-toggle" data-op="/" aria-pressed="false">
+          <span class="op-symbol">÷</span><span class="op-name">Division</span>
+          <svg class="op-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
+        </button>
+      </div>
+      <p class="hint">Pick at least one. Division always gives whole-number answers.</p>
+    </section>
+
+    <section class="group" aria-labelledby="range-label">
+      <h2 id="range-label" class="eyebrow">Range</h2>
+      <div class="range-grid">
+        <label class="field">Lowest
+          <input id="range-lo" type="number" inputmode="numeric" min="0" max="999" step="1" value="0">
+        </label>
+        <label class="field">Highest
+          <input id="range-hi" type="number" inputmode="numeric" min="0" max="999" step="1" value="100">
+        </label>
+      </div>
+      <p class="hint">Sets the numbers you add and multiply, and the answers when you subtract and divide.</p>
+    </section>
+
+    <section class="group" aria-labelledby="diff-label">
+      <h2 id="diff-label" class="eyebrow">Difficulty</h2>
+      <div class="segmented" role="radiogroup" aria-labelledby="diff-label">
+        <button type="button" class="segment" role="radio" data-difficulty="easy" aria-checked="false">
+          <span class="segment-name">Easy</span><span class="segment-sub"></span>
+        </button>
+        <button type="button" class="segment" role="radio" data-difficulty="normal" aria-checked="true">
+          <span class="segment-name">Normal</span><span class="segment-sub"></span>
+        </button>
+        <button type="button" class="segment" role="radio" data-difficulty="hard" aria-checked="false">
+          <span class="segment-name">Hard</span><span class="segment-sub"></span>
+        </button>
+      </div>
+      <p class="hint">Time per question. When it runs out, the next one appears.</p>
+    </section>
+
+    <div class="spacer"></div>
+
+    <p id="setup-error" class="setup-error" role="alert" aria-live="polite" hidden></p>
+    <button type="button" id="start-btn" class="btn btn-dark">
+      Start round
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </section>
+
+  <!-- 2 · In game -->
+  <section id="screen-game" class="screen screen-game" aria-label="Round in progress" hidden>
+    <div class="game-top">
+      <button type="button" id="quit-btn" class="icon-btn" aria-label="Quit round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="progress-wrap">
+        <span id="q-counter" class="q-counter">Question 1 of 10</span>
+        <div id="progress" class="progress" aria-hidden="true"></div>
+      </div>
+      <div class="score-chip">
+        <span class="score-chip-label">Score</span>
+        <span id="score-live" class="score-chip-value">0</span>
+      </div>
+    </div>
+
+    <div class="timer" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg>
+      <div class="timer-track"><div id="timer-bar" class="timer-bar"></div></div>
+      <span id="timer-label" class="timer-label"></span>
+    </div>
+
+    <div class="card question-card">
+      <div id="problem" class="problem" aria-live="polite"></div>
+      <div id="answer" class="answer" role="status" aria-label="Your answer">
+        <span id="answer-text" class="answer-text"></span><span class="caret"></span>
+      </div>
+      <p id="feedback" class="feedback" role="status" aria-live="assertive"></p>
+    </div>
+
+    <div class="keypad">
+      <button type="button" class="key" data-key="1">1</button>
+      <button type="button" class="key" data-key="2">2</button>
+      <button type="button" class="key" data-key="3">3</button>
+      <button type="button" class="key" data-key="4">4</button>
+      <button type="button" class="key" data-key="5">5</button>
+      <button type="button" class="key" data-key="6">6</button>
+      <button type="button" class="key" data-key="7">7</button>
+      <button type="button" class="key" data-key="8">8</button>
+      <button type="button" class="key" data-key="9">9</button>
+      <button type="button" class="key key-alt key-text" data-key="clear">Clear</button>
+      <button type="button" class="key" data-key="0">0</button>
+      <button type="button" class="key key-alt" data-key="back" aria-label="Delete last digit">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M17 9l-5 5M12 9l5 5"/></svg>
+      </button>
+    </div>
+
+    <button type="button" id="submit-btn" class="btn btn-accent" disabled>
+      Submit answer
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
+    </button>
+  </section>
+
+  <!-- 3 · Score / play again -->
+  <section id="screen-score" class="screen screen-score" aria-labelledby="score-title" hidden>
+    <h1 id="score-title" class="title title-sm">Round complete</h1>
+
+    <div class="score-card">
+      <div class="score-big"><span id="final-score" class="score-num">0</span><span class="score-of">/ 10</span></div>
+      <div class="score-meta">
+        <span id="score-message" class="score-message"></span>
+        <span id="score-difficulty" class="score-detail"></span>
+        <span id="score-range" class="score-detail"></span>
+      </div>
+    </div>
+
+    <section class="card results" aria-labelledby="results-label">
+      <h2 id="results-label" class="eyebrow">Your answers</h2>
+      <ol id="results" class="result-list"></ol>
+    </section>
+
+    <div class="score-actions">
+      <button type="button" id="again-btn" class="btn btn-accent">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+        Play again
+      </button>
+      <button type="button" id="settings-btn" class="btn btn-outline">Change settings</button>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>
